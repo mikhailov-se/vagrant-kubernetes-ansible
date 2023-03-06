@@ -107,7 +107,10 @@
         - mkdir -p /home/vagrant/.kube
         - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
         - chown vagrant:vagrant /home/vagrant/.kube/config
-    
+          
+    - name: Install Calico pod network
+      command: kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
+
     #- name: Install calico pod network
     #  become: false
     #  command: kubectl create -f https://docs.projectcalico.org/manifests/calico.yaml
@@ -126,8 +129,8 @@
         src: /home/vagrant/.kube/config
         dest: ./config
         flat: yes    
-        
-        
+
+ 
     # handlers file for master-node
   handlers:
     - name: docker status
