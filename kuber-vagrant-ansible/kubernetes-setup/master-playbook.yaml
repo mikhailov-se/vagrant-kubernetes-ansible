@@ -37,12 +37,6 @@
       notify:
         - docker status
 
-#    - name: Docker daemon config
-#      copy:
-#        src: daemon.json
-#        dest: "/etc/docker/daemon.json"
-#        mode: 0644
-
     - name: Restart docker
       systemd:
         state: restarted
@@ -86,17 +80,8 @@
         create: yes
         mode: 0644
 
-    #- name: Configure local registry running in localhost
-    #  lineinfile:
-    #    dest: /etc/hosts
-    #    line: "10.0.2.2 localregistry.local"
-    #    state: present
-
     - name: Config kubeadm images
       command: kubeadm config images pull
-    # vars file for master-node
-    #    pod_cidr: "192.168.0.0/16"
-    #    node_ip: "10.0.0.10"
     
     - name: Initialize the Kubernetes cluster using kubeadm
       command: kubeadm init --apiserver-advertise-address="{{ "10.0.0.10" }}" --apiserver-cert-extra-sans="{{ "10.0.0.10" }}" --node-name k8s-master --pod-network-cidr="{{ "192.168.0.0/16" }}"
@@ -109,11 +94,8 @@
         - chown vagrant:vagrant /home/vagrant/.kube/config
           
     - name: Install Calico pod network
+      become: false
       command: kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
-
-    #- name: Install calico pod network
-    #  become: false
-    #  command: kubectl create -f https://docs.projectcalico.org/manifests/calico.yaml
 
     - name: Generate join command
       command: kubeadm token create --print-join-command
@@ -131,7 +113,7 @@
         flat: yes    
 
  
-    # handlers file for master-node
+ # handlers file for master-node
   handlers:
     - name: docker status
       service: name=docker state=started
